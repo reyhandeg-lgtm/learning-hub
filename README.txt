@@ -27,6 +27,8 @@ CURRICULUM UPDATES
 Add, remove, reorder, or edit tracks and lessons in curriculum.js. Keep an existing
 lesson's id unchanged so completion progress survives an update. The app checks for
 a fresh curriculum when online and falls back to its cached copy when offline.
+For a lesson with both reading and video options, add a resources array containing a
+label and URL for each choice. Both choices remain under one trackable lesson record.
 
 Note:
 Opening index.html directly from the iPhone Files app is fine for inspection, but the PWA/service-worker

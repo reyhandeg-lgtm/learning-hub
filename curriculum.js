@@ -5,11 +5,11 @@
  * Keep lesson IDs stable after release so saved completion progress is preserved.
  */
 window.LEARNING_HUB_CURRICULUM = {
-  version: "2026.08.2",
+  version: "2026.08.3",
   tracks: [
     {
       id: "business",
-      name: "Business Case Development",
+      name: "Business Case and Financial Analysis",
       summary: "Product-development economics, investment logic, uncertainty, and go/no-go decisions."
     },
     {
@@ -28,13 +28,27 @@ window.LEARNING_HUB_CURRICULUM = {
       id: "bc-demand-forecasting",
       track: "business",
       title: "Forecasting Demand for a New Product",
-      source: "MIT OpenCourseWare",
-      creator: "Mahender Singh",
-      credentials: "Guest lecturer in MIT's graduate Logistics Systems course; specialist lecture on new-product forecasting.",
+      source: "MIT OpenCourseWare + NotebookLM overview",
+      creator: "Mahender Singh (source presentation)",
+      credentials: "Guest lecturer in MIT's graduate Logistics Systems course; specialist lecture on new-product forecasting. The optional video is an AI-generated NotebookLM overview of the MIT presentation.",
       url: "https://ocw.mit.edu/courses/esd-260j-logistics-systems-fall-2006/0be27a467617b4a83c6ba512933d7e5d_lect5.pdf",
-      duration: "20–25 min",
-      mode: "Focused Study",
-      description: "Opens the MIT PDF directly. Build defensible market and volume assumptions; focus on where uncertainty enters the estimate."
+      resources: [
+        {
+          label: "Read presentation",
+          url: "https://ocw.mit.edu/courses/esd-260j-logistics-systems-fall-2006/0be27a467617b4a83c6ba512933d7e5d_lect5.pdf",
+          type: "reading",
+          duration: "20–25 min"
+        },
+        {
+          label: "Watch overview video",
+          url: "https://drive.google.com/file/d/1NrC8KMs7UqNKNQX6RrT3XtAqWkAGVlXp/view?usp=drive_link",
+          type: "video",
+          duration: "~10 min"
+        }
+      ],
+      duration: "~10 min video / 20–25 min reading",
+      mode: "Watch or Focused Study",
+      description: "Build defensible market and volume assumptions and identify where uncertainty enters a new-product forecast. Choose the short NotebookLM video overview, the full MIT presentation, or both."
     },
     {
       id: "bc-financial-projections",
