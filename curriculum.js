@@ -5,7 +5,7 @@
  * Keep lesson IDs stable after release so saved completion progress is preserved.
  */
 window.LEARNING_HUB_CURRICULUM = {
-  version: "2026.08.3",
+  version: "2026.08.4",
   tracks: [
     {
       id: "business",
@@ -41,7 +41,7 @@ window.LEARNING_HUB_CURRICULUM = {
         },
         {
           label: "Watch overview video",
-          url: "https://drive.google.com/file/d/1NrC8KMs7UqNKNQX6RrT3XtAqWkAGVlXp/view?usp=drive_link",
+          url: "video-player.html?src=forecasting-demand-overview.mp4&title=Forecasting%20Demand%20for%20a%20New%20Product&drive=https%3A%2F%2Fdrive.google.com%2Ffile%2Fd%2F1NrC8KMs7UqNKNQX6RrT3XtAqWkAGVlXp%2Fview%3Fusp%3Ddrive_link",
           type: "video",
           duration: "~10 min"
         }

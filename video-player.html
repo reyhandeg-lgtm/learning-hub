@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#132d25">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Training Video</title>
+  <style>
+    :root{--bg:#101713;--panel:#17231e;--text:#f4f7f5;--muted:#b9c6c0;--accent:#7bc2a7}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{max-width:980px;margin:auto;padding:max(18px,env(safe-area-inset-top)) 14px max(24px,env(safe-area-inset-bottom))}
+    a{color:var(--accent)}
+    .back{display:inline-block;margin-bottom:16px;text-decoration:none;font-weight:700}
+    h1{font-size:1.35rem;margin:0 0 8px}
+    .hint{color:var(--muted);margin:0 0 14px}
+    .frame{background:#000;border-radius:14px;overflow:hidden;box-shadow:0 12px 40px #0008}
+    video{display:block;width:100%;height:auto;background:#000}
+    .backup{margin-top:16px;padding:12px 14px;background:var(--panel);border-radius:12px;color:var(--muted)}
+    @media(orientation:landscape) and (max-height:600px){main{padding:0}.back,h1,.hint,.backup{display:none}.frame{border-radius:0}video{height:100vh;object-fit:contain}}
+  </style>
+</head>
+<body>
+<main>
+  <a class="back" href="./">← Back to Learning Hub</a>
+  <h1 id="title">Training video</h1>
+  <p class="hint">Tap Play. On iPhone, the native video player opens full-screen; rotate the phone for the largest view.</p>
+  <div class="frame"><video id="video" controls preload="metadata"></video></div>
+  <div class="backup" id="backup" hidden>If playback is unavailable, <a id="driveLink" target="_blank" rel="noopener">open the backup in Google Drive</a>.</div>
+</main>
+<script>
+const params=new URLSearchParams(location.search);
+const source=params.get("src")||"";
+const title=params.get("title")||"Training video";
+const drive=params.get("drive")||"";
+if(!/^[a-z0-9][a-z0-9._-]*\.mp4$/i.test(source)) {
+  document.querySelector(".hint").textContent="This video link is invalid.";
+} else {
+  document.getElementById("video").src=source;
+}
+document.getElementById("title").textContent=title;
+document.title=title+" – Learning Hub";
+if(/^https:\/\/drive\.google\.com\//i.test(drive)) {
+  document.getElementById("driveLink").href=drive;
+  document.getElementById("backup").hidden=false;
+}
+</script>
+</body>
+</html>

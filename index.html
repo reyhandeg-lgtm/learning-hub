@@ -175,9 +175,10 @@ function resourceLinks(lesson,actionPrefix="") {
   const resources=Array.isArray(lesson.resources)&&lesson.resources.length
     ? lesson.resources
     : [{label:actionPrefix||"Open lesson",url:lesson.url}];
-  return `<div class="lesson-links">${resources.map((resource,index)=>
-    `<a class="lesson${index?" secondary":""}" href="${esc(resource.url)}" target="_blank" rel="noopener">${esc(resource.label||"Open lesson")} ↗</a>`
-  ).join("")}</div>`;
+  return `<div class="lesson-links">${resources.map((resource,index)=>{
+    const localVideo=resource.type==="video"&&String(resource.url||"").startsWith("video-player.html");
+    return `<a class="lesson${index?" secondary":""}" href="${esc(resource.url)}" target="${localVideo?"_self":"_blank"}" rel="noopener">${esc(resource.label||"Open lesson")} ${localVideo?"▶":"↗"}</a>`;
+  }).join("")}</div>`;
 }
 
 function save(shouldSync=true) {

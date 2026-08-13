@@ -5,6 +5,8 @@ Files:
 - curriculum.js (edit this file for future lesson/track updates)
 - google-drive-config.js (public Google OAuth client ID)
 - google-drive-sync.js (Google Drive synchronization)
+- video-player.html (reusable native iPhone video player)
+- forecasting-demand-overview.mp4 (optimized local training video)
 - report.js and jspdf.umd.min.js (PDF learning reports)
 - manifest.json
 - sw.js
@@ -29,6 +31,9 @@ lesson's id unchanged so completion progress survives an update. The app checks 
 a fresh curriculum when online and falls back to its cached copy when offline.
 For a lesson with both reading and video options, add a resources array containing a
 label and URL for each choice. Both choices remain under one trackable lesson record.
+Local MP4 lessons use video-player.html so iPhone can use its native full-screen player.
+Keep each MP4 below GitHub's 25 MiB browser-upload limit and do not add MP4 files to the
+service-worker ASSETS list; videos stream on demand rather than downloading at install.
 
 Note:
 Opening index.html directly from the iPhone Files app is fine for inspection, but the PWA/service-worker
