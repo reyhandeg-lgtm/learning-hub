@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1f5c4a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Dispersant Learning">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Dispersant Learning</title>
+  <style>
+    :root {
+      --bg:#f6f7f5; --card:#ffffff; --text:#17211d; --muted:#66726c;
+      --border:#dfe5e1; --accent:#1f5c4a; --accent2:#e6f0ec; --danger:#8a3f3f;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .wrap{max-width:760px;margin:auto;padding:20px 16px 48px}
+    h1{font-size:1.55rem;margin:0 0 4px} h2{font-size:1.08rem;margin:24px 0 10px}
+    .sub{color:var(--muted);font-size:.93rem}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+    .stat,.card{background:var(--card);border:1px solid var(--border);border-radius:16px}
+    .stat{padding:12px} .stat b{display:block;font-size:1.35rem;margin-top:2px}
+    .progress{height:10px;background:#e4e8e5;border-radius:999px;overflow:hidden}
+    .bar{height:100%;background:var(--accent);width:0}
+    .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+    select,button,.filelabel{width:100%;border:1px solid var(--border);background:var(--card);border-radius:12px;padding:11px 12px;font:inherit;color:inherit}
+    button.primary{background:var(--accent);color:white;border-color:var(--accent)}
+    button.small,.filelabel{width:auto;padding:8px 10px;font-size:.9rem}
+    .next{padding:14px 15px;background:var(--accent2);border-radius:14px;margin:16px 0}
+    .section-title{margin-top:22px;font-weight:700}
+    .card{padding:14px;margin:9px 0}
+    .row{display:flex;gap:12px;align-items:flex-start}
+    input[type=checkbox]{width:22px;height:22px;margin-top:2px;accent-color:var(--accent)}
+    .grow{flex:1;min-width:0}
+    .title{font-weight:700}
+    .meta{display:flex;flex-wrap:wrap;gap:7px;margin:7px 0;color:var(--muted);font-size:.88rem}
+    .chip{background:#eef2ef;border-radius:999px;padding:3px 8px}
+    a.lesson{display:inline-block;text-decoration:none;background:var(--accent);color:white;border-radius:11px;padding:9px 12px;margin-top:7px;font-weight:600}
+    .done .title{text-decoration:line-through;color:var(--muted)}
+    .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+    .note{font-size:.84rem;color:var(--muted);margin-top:18px}
+    #importFile{display:none}
+    @media(max-width:520px){.toolbar{grid-template-columns:1fr} .stats{gap:7px} .stat{padding:10px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Dispersant Learning</h1>
+  <div class="sub">PCE chemistry • surfactants • air/defoamers • business-case development</div>
+
+  <div class="stats">
+    <div class="stat"><span class="sub">Completed</span><b id="done">0</b></div>
+    <div class="stat"><span class="sub">Lessons</span><b id="total">0</b></div>
+    <div class="stat"><span class="sub">Progress</span><b id="pct">0%</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <div class="toolbar">
+    <select id="track">
+      <option value="All">All tracks</option>
+      <option>Business Case</option>
+      <option>PCE / Polymer</option>
+      <option>Air / Defoamer</option>
+    </select>
+    <select id="mode">
+      <option value="All">Any learning mode</option>
+      <option>Good for Walking</option>
+      <option>Mostly Listen</option>
+      <option>Watch</option>
+      <option>Focus</option>
+    </select>
+  </div>
+
+  <button class="primary" id="nextBtn">Show my next lesson</button>
+  <div class="next" id="nextBox">Tap “Show my next lesson” when you have a few minutes.</div>
+
+  <div id="list"></div>
+
+  <div class="actions">
+    <button class="small" id="exportBtn">Export progress</button>
+    <label class="filelabel">Import progress<input type="file" id="importFile" accept="application/json"></label>
+    <button class="small" id="resetBtn">Reset progress</button>
+  </div>
+  <div class="note">Progress is stored on this device/browser. Export a backup occasionally if you want an easy restore option.</div>
+</div>
+
+<script>
+const lessons = [{"id": "business-case", "track": "Business Case", "title": "Create Compelling Business Cases", "source": "Coursera", "url": "https://www.coursera.org/learn/create-compelling-business-cases", "duration": "~4 hr total", "mode": "Focus", "description": "Business-case structure, stakeholders, risk, ROI/payback, financial analysis, and executive summary."}, {"id": "polymer-structure", "track": "PCE / Polymer", "title": "Polymer Nomenclature and Structure", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=QYCpo-C-dHo", "duration": "~48 min", "mode": "Mostly Listen", "description": "Polymer architecture vocabulary and structural differences relevant to PCE raw materials."}, {"id": "polymer-size-shape", "track": "PCE / Polymer", "title": "Polymer Size and Shape", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=Pxk1MO5jBrU", "duration": "~45 min", "mode": "Watch", "description": "Chain conformation, size, shape, and how molecular architecture affects behavior."}, {"id": "molecular-weight", "track": "PCE / Polymer", "title": "Molecular Weight Measurements", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=87kBD_xsOh4", "duration": "~39 min", "mode": "Watch", "description": "Molecular-weight averages, distributions, intrinsic viscosity, and why MW data need context."}, {"id": "surface-tension", "track": "Air / Defoamer", "title": "Surface Energy and Surface Tension", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=rlwcM9IorUw", "duration": "~26 min", "mode": "Mostly Listen", "description": "Physical basis of surface tension and the air\u2013water interface."}, {"id": "surfactant-background", "track": "Air / Defoamer", "title": "Surfactant Background, Examples and Structure", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=t7W9kNCkRtQ", "duration": "~33 min", "mode": "Good for Walking", "description": "How amphiphilic structure drives adsorption and interfacial behavior."}, {"id": "micelles-cmc", "track": "Air / Defoamer", "title": "Micelle Formation, CMC, Krafft Temperature and Cloud Point", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=jCHjZIrf2Pg", "duration": "~32 min", "mode": "Watch", "description": "Micellization and the meaning of critical micelle concentration."}, {"id": "hydrophobic-colloids", "track": "PCE / Polymer", "title": "Hydrophobic Colloids, Particle Size and Settling Stability", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=vcAZvk091_c", "duration": "~35 min", "mode": "Mostly Listen", "description": "A bridge from polymer/surfactant fundamentals into colloidal particle behavior."}, {"id": "foams", "track": "Air / Defoamer", "title": "Introduction to Foams", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=62czT-p7JLE", "duration": "~35 min", "mode": "Mostly Listen", "description": "Foam films, drainage, stability, and the physical basis for persistent air."}, {"id": "mit-interfaces", "track": "Air / Defoamer", "title": "Interfacial Phenomena \u2014 Selected Deep Dives", "source": "MIT OpenCourseWare", "url": "https://ocw.mit.edu/courses/18-357-interfacial-phenomena-fall-2010/", "duration": "Choose selected topics", "mode": "Focus", "description": "Graduate-level material on drops, bubbles, surfactants, wetting, Marangoni effects, and interfacial tension."}];
+const KEY = "dispersant-learning-v1";
+let completed = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
+const list = document.getElementById("list");
+const track = document.getElementById("track");
+const mode = document.getElementById("mode");
+
+function save() {
+  localStorage.setItem(KEY, JSON.stringify([...completed]));
+}
+function progress() {
+  const n=completed.size, t=lessons.length, p=Math.round(n/t*100);
+  done.textContent=n; total.textContent=t; pct.textContent=p+"%"; bar.style.width=p+"%";
+}
+function render() {
+  list.innerHTML="";
+  const filtered=lessons.filter(x => (track.value==="All"||x.track===track.value) && (mode.value==="All"||x.mode===mode.value));
+  const groups=[...new Set(filtered.map(x=>x.track))];
+  for (const g of groups) {
+    const h=document.createElement("div"); h.className="section-title"; h.textContent=g; list.appendChild(h);
+    for (const x of filtered.filter(y=>y.track===g)) {
+      const c=document.createElement("div"); c.className="card"+(completed.has(x.id)?" done":"");
+      c.innerHTML=`<div class="row">
+        <input type="checkbox" aria-label="Mark ${x.title} complete" ${completed.has(x.id)?"checked":""}>
+        <div class="grow">
+          <div class="title">${x.title}</div>
+          <div class="sub">${x.description}</div>
+          <div class="meta"><span class="chip">${x.duration}</span><span class="chip">${x.mode}</span><span>${x.source}</span></div>
+          <a class="lesson" href="${x.url}" target="_blank" rel="noopener">Open lesson ↗</a>
+        </div></div>`;
+      c.querySelector("input").addEventListener("change", e => {
+        e.target.checked ? completed.add(x.id) : completed.delete(x.id);
+        save(); progress(); render();
+      });
+      list.appendChild(c);
+    }
+  }
+  if(!filtered.length) list.innerHTML='<div class="sub">No lessons match those filters.</div>';
+}
+function showNext() {
+  const filtered=lessons.filter(x => (track.value==="All"||x.track===track.value) && (mode.value==="All"||x.mode===mode.value));
+  const x=filtered.find(y=>!completed.has(y.id));
+  nextBox.innerHTML = x
+    ? `<b>${x.title}</b><br><span class="sub">${x.duration} • ${x.mode} • ${x.source}</span><br><a class="lesson" href="${x.url}" target="_blank" rel="noopener">Start lesson ↗</a>`
+    : `<b>All matching lessons are complete.</b>`;
+}
+nextBtn.addEventListener("click", showNext);
+track.addEventListener("change", render);
+mode.addEventListener("change", render);
+
+exportBtn.addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify({completed:[...completed], exported:new Date().toISOString()},null,2)], {type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="dispersant-learning-progress.json"; a.click(); URL.revokeObjectURL(a.href);
+});
+importFile.addEventListener("change", async e => {
+  const f=e.target.files[0]; if(!f) return;
+  try {
+    const data=JSON.parse(await f.text());
+    completed=new Set(data.completed||[]);
+    save(); progress(); render();
+  } catch { alert("Could not read that progress file."); }
+  e.target.value="";
+});
+resetBtn.addEventListener("click", () => {
+  if(confirm("Reset all completed lessons?")) { completed.clear(); save(); progress(); render(); }
+});
+
+progress(); render();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
