@@ -33,7 +33,7 @@
 
   function formatDate(iso) {
     if (!iso) return "Date not recorded";
-    const date = new Date(iso);
+    const date = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(iso + "T12:00:00") : new Date(iso);
     if (Number.isNaN(date.getTime())) return "Date not recorded";
     return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
   }
@@ -49,9 +49,10 @@
     const completedLessons = curriculum.lessons.filter(x => completedIds.has(x.id));
     const trackById = new Map(curriculum.tracks.map(x => [x.id, x]));
     const activeTracks = curriculum.tracks.filter(t => completedLessons.some(x => x.track === t.id));
-    const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
-    const pageWidth = 210;
-    const pageHeight = 297;
+    const paperSize = options.paperSize === "letter" ? "letter" : "a4";
+    const doc = new jsPDF({ unit: "mm", format: paperSize, orientation: "portrait", compress: true });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 18;
     const contentWidth = pageWidth - margin * 2;
     let y = 0;

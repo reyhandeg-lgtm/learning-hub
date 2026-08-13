@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#1f5c4a">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Learning Hub">
@@ -26,6 +27,11 @@
     .stat{padding:12px} .stat b{display:block;font-size:1.35rem;margin-top:2px}
     .progress{height:10px;background:#e4e8e5;border-radius:999px;overflow:hidden}
     .bar{height:100%;background:var(--accent);width:0}
+    .sync-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:13px 14px;margin:16px 0}
+    .sync-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+    .sync-row button{width:auto}
+    .sync-status{font-size:.86rem;color:var(--muted);margin-top:7px}
+    .sync-status.good{color:var(--accent)} .sync-status.bad{color:var(--danger)}
     .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
     select,button,.filelabel{width:100%;border:1px solid var(--border);background:var(--card);border-radius:12px;padding:11px 12px;font:inherit;color:inherit}
     button.primary{background:var(--accent);color:white;border-color:var(--accent)}
@@ -48,7 +54,9 @@
     .dialog-body{padding:20px}
     .dialog-body h2{margin:0 0 5px;font-size:1.2rem}
     .field{display:block;margin-top:14px;font-weight:700;font-size:.9rem}
-    .field input{display:block;width:100%;margin-top:5px;border:1px solid var(--border);border-radius:11px;padding:11px 12px;font:inherit}
+    .field input,.field select{display:block;width:100%;margin-top:5px;border:1px solid var(--border);border-radius:11px;padding:11px 12px;font:inherit;background:var(--card);color:inherit}
+    .completion-date{display:flex;align-items:center;gap:9px;margin-top:11px;color:var(--muted);font-size:.86rem}
+    .completion-date input{width:auto;min-height:38px;border:1px solid var(--border);border-radius:10px;padding:7px 9px;background:var(--card);color:var(--text);font:inherit}
     .dialog-actions{display:flex;gap:9px;margin-top:20px}
     .dialog-actions button{flex:1}
     .note{font-size:.84rem;color:var(--muted);margin-top:18px}
@@ -68,6 +76,14 @@
     <div class="stat"><span class="sub">Progress</span><b id="pct">0%</b></div>
   </div>
   <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <div class="sync-card">
+    <div class="sync-row">
+      <button class="small primary" id="googleConnectBtn">Connect Google Drive</button>
+      <button class="small" id="syncNowBtn" hidden>Sync now</button>
+    </div>
+    <div class="sync-status" id="syncStatus">Connect Google Drive to synchronize across devices.</div>
+  </div>
 
   <div class="toolbar">
     <select id="track">
@@ -89,15 +105,16 @@
     <label class="filelabel">Import progress<input type="file" id="importFile" accept="application/json"></label>
     <button class="small" id="resetBtn">Reset progress</button>
   </div>
-  <div class="note">Progress is stored on this device/browser. Export a backup occasionally if you want an easy restore option.</div>
+  <div class="note">Progress works offline on this device. Connect Google Drive on each device for synchronization; export remains available as a backup.</div>
 </div>
 
 <dialog id="reportDialog">
   <form method="dialog" class="dialog-body" id="reportForm">
     <h2>Create learning report</h2>
-    <div class="sub">Your details are saved only on this device and appear at the top of the PDF.</div>
-    <label class="field">Full name<input id="learnerName" autocomplete="name" required maxlength="80"></label>
+    <div class="sub">Enter the course taker's name exactly as it should appear on the PDF. Report details synchronize when Google Drive is connected.</div>
+    <label class="field">Course taker name<input id="learnerName" autocomplete="name" required maxlength="80" placeholder="Name to display on the report"></label>
     <label class="field">Job title or team (optional)<input id="learnerTitle" maxlength="120" placeholder="e.g., R&amp;D Product Development"></label>
+    <label class="field">Paper size<select id="reportPaperSize"><option value="a4">A4</option><option value="letter">Letter (US)</option></select></label>
     <div class="dialog-actions">
       <button value="cancel" type="button" id="cancelReport">Cancel</button>
       <button value="create" class="primary" type="submit">Create PDF</button>
@@ -108,18 +125,39 @@
 <script src="curriculum.js"></script>
 <script src="jspdf.umd.min.js"></script>
 <script src="report.js"></script>
+<script src="google-drive-config.js"></script>
+<script src="google-drive-sync.js"></script>
 <script>
 const curriculum = window.LEARNING_HUB_CURRICULUM;
 const lessons = curriculum.lessons;
 const KEY = "dispersant-learning-v1";
 const DATE_KEY = "dispersant-learning-completed-at-v1";
 const PROFILE_KEY = "learning-hub-report-profile-v1";
+const SYNC_META_KEY = "learning-hub-sync-meta-v1";
 let completed;
 try { completed = new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); }
 catch { completed = new Set(); }
 let completedAt;
 try { completedAt = JSON.parse(localStorage.getItem(DATE_KEY) || "{}"); }
 catch { completedAt = {}; }
+let syncMeta;
+try { syncMeta = JSON.parse(localStorage.getItem(SYNC_META_KEY) || "{}"); }
+catch { syncMeta = {}; }
+if(!syncMeta||typeof syncMeta!=="object") syncMeta={};
+if(!syncMeta.lessons||typeof syncMeta.lessons!=="object") syncMeta.lessons={};
+for(const id of completed) {
+  if(!syncMeta.lessons[id]) {
+    const savedDate=completedAt[id];
+    const migratedAt=savedDate ? (String(savedDate).length===10 ? savedDate+"T12:00:00.000Z" : savedDate) : "1970-01-01T00:00:00.000Z";
+    syncMeta.lessons[id]={completed:true,date:savedDate||null,updatedAt:migratedAt};
+  }
+}
+if(!syncMeta.profile) {
+  try {
+    const savedProfile=JSON.parse(localStorage.getItem(PROFILE_KEY)||"null");
+    if(savedProfile) syncMeta.profile={value:savedProfile,updatedAt:"1970-01-01T00:00:00.000Z"};
+  } catch {}
+}
 const list = document.getElementById("list");
 const track = document.getElementById("track");
 const mode = document.getElementById("mode");
@@ -131,9 +169,24 @@ function esc(value) {
   return String(value).replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
 }
 
-function save() {
+function save(shouldSync=true) {
+  localStorage.setItem(SYNC_META_KEY,JSON.stringify(syncMeta));
   localStorage.setItem(KEY, JSON.stringify([...completed]));
   localStorage.setItem(DATE_KEY, JSON.stringify(completedAt));
+  if(shouldSync&&window.GoogleDriveLearningSync) window.GoogleDriveLearningSync.notifyLocalChange();
+}
+function recordLessonChange(id,isCompleted,date) {
+  syncMeta.lessons[id]={completed:isCompleted,date:isCompleted?(date||null):null,updatedAt:new Date().toISOString()};
+}
+function todayLocal() {
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function dateInputValue(value) {
+  if(!value) return todayLocal();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  const d=new Date(value);
+  return Number.isNaN(d.getTime()) ? todayLocal() : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 function progress() {
   const n=lessons.filter(x => completed.has(x.id)).length, t=lessons.length, p=t ? Math.round(n/t*100) : 0;
@@ -155,16 +208,27 @@ function render() {
           <div class="sub">${esc(x.description)}</div>
           <div class="meta"><span class="chip">${esc(x.duration)}</span><span class="chip">${esc(x.mode)}</span><span>${esc(x.source)}</span></div>
           <a class="lesson" href="${esc(x.url)}" target="_blank" rel="noopener">Open lesson ↗</a>
+          ${completed.has(x.id)?`<label class="completion-date">Completion date <input class="date-editor" type="date" value="${esc(dateInputValue(completedAt[x.id]))}" aria-label="Completion date for ${esc(x.title)}"></label>`:""}
         </div></div>`;
-      c.querySelector("input").addEventListener("change", e => {
+      c.querySelector('input[type="checkbox"]').addEventListener("change", e => {
         if(e.target.checked) {
           completed.add(x.id);
-          if(!completedAt[x.id]) completedAt[x.id]=new Date().toISOString();
+          if(!completedAt[x.id]) completedAt[x.id]=todayLocal();
+          recordLessonChange(x.id,true,completedAt[x.id]);
         } else {
           completed.delete(x.id);
           delete completedAt[x.id];
+          recordLessonChange(x.id,false,null);
         }
         save(); progress(); render();
+      });
+      const dateEditor=c.querySelector(".date-editor");
+      if(dateEditor) dateEditor.addEventListener("change", e => {
+        if(e.target.value) {
+          completedAt[x.id]=e.target.value;
+          recordLessonChange(x.id,true,e.target.value);
+          save();
+        }
       });
       list.appendChild(c);
     }
@@ -181,9 +245,17 @@ function showNext() {
 nextBtn.addEventListener("click", showNext);
 track.addEventListener("change", render);
 mode.addEventListener("change", render);
+window.addEventListener("storage", e => {
+  if(e.key!==KEY&&e.key!==DATE_KEY&&e.key!==SYNC_META_KEY) return;
+  try { completed=new Set(JSON.parse(localStorage.getItem(KEY)||"[]")); } catch { completed=new Set(); }
+  try { completedAt=JSON.parse(localStorage.getItem(DATE_KEY)||"{}"); } catch { completedAt={}; }
+  try { syncMeta=JSON.parse(localStorage.getItem(SYNC_META_KEY)||"{}"); } catch { syncMeta={lessons:{}}; }
+  if(!syncMeta.lessons) syncMeta.lessons={};
+  progress(); render();
+});
 
 exportBtn.addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify({completed:[...completed], completedAt, curriculumVersion:curriculum.version, exported:new Date().toISOString()},null,2)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({completed:[...completed],completedAt,syncMeta,curriculumVersion:curriculum.version,exported:new Date().toISOString()},null,2)], {type:"application/json"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="learning-hub-progress.json"; a.click(); URL.revokeObjectURL(a.href);
 });
 importFile.addEventListener("change", async e => {
@@ -192,12 +264,25 @@ importFile.addEventListener("change", async e => {
     const data=JSON.parse(await f.text());
     completed=new Set(data.completed||[]);
     completedAt=data.completedAt&&typeof data.completedAt==="object" ? data.completedAt : {};
+    if(data.syncMeta&&typeof data.syncMeta==="object") {
+      syncMeta=data.syncMeta;
+      if(!syncMeta.lessons||typeof syncMeta.lessons!=="object") syncMeta.lessons={};
+    }
+    else {
+      const changedAt=new Date().toISOString();
+      syncMeta.lessons=syncMeta.lessons||{};
+      lessons.forEach(x=>syncMeta.lessons[x.id]={completed:completed.has(x.id),date:completedAt[x.id]||null,updatedAt:changedAt});
+    }
     save(); progress(); render();
   } catch { alert("Could not read that progress file."); }
   e.target.value="";
 });
 resetBtn.addEventListener("click", () => {
-  if(confirm("Reset all completed lessons?")) { completed.clear(); completedAt={}; save(); progress(); render(); }
+  if(confirm("Reset all completed lessons on every synchronized device?")) {
+    const changedAt=new Date().toISOString();
+    lessons.forEach(x=>syncMeta.lessons[x.id]={completed:false,date:null,updatedAt:changedAt});
+    completed.clear(); completedAt={}; save(); progress(); render();
+  }
 });
 
 const reportDialog=document.getElementById("reportDialog");
@@ -206,23 +291,27 @@ const reportBtnEl=document.getElementById("reportBtn");
 const cancelReportEl=document.getElementById("cancelReport");
 const learnerNameEl=document.getElementById("learnerName");
 const learnerTitleEl=document.getElementById("learnerTitle");
+const reportPaperSizeEl=document.getElementById("reportPaperSize");
 reportBtnEl.addEventListener("click", () => {
   if(!lessons.some(x=>completed.has(x.id))) { alert("Complete at least one lesson before creating a report."); return; }
   let profile={};
   try { profile=JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}"); } catch {}
   learnerNameEl.value=profile.name||"";
   learnerTitleEl.value=profile.title||"";
+  reportPaperSizeEl.value=profile.paperSize==="letter"?"letter":"a4";
   reportDialog.showModal();
   setTimeout(()=>learnerNameEl.focus(),50);
 });
 cancelReportEl.addEventListener("click",()=>reportDialog.close());
 reportForm.addEventListener("submit", e => {
   e.preventDefault();
-  const profile={name:learnerNameEl.value.trim(),title:learnerTitleEl.value.trim()};
+  const profile={name:learnerNameEl.value.trim(),title:learnerTitleEl.value.trim(),paperSize:reportPaperSizeEl.value};
   if(!profile.name) { learnerNameEl.focus(); return; }
   localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));
+  syncMeta.profile={value:profile,updatedAt:new Date().toISOString()};
+  save();
   try {
-    const doc=window.buildLearningReport({curriculum,completedIds:[...completed],completedAt,learner:profile,generatedAt:new Date().toISOString()});
+    const doc=window.buildLearningReport({curriculum,completedIds:[...completed],completedAt,learner:profile,paperSize:profile.paperSize,generatedAt:new Date().toISOString()});
     const safeName=profile.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"learning";
     doc.save(`${safeName}-learning-record.pdf`);
     reportDialog.close();
@@ -231,8 +320,60 @@ reportForm.addEventListener("submit", e => {
   }
 });
 
+function currentSyncState() {
+  return {
+    schemaVersion:1,
+    curriculumVersion:curriculum.version,
+    lessons:syncMeta.lessons||{},
+    profile:syncMeta.profile||null,
+    updatedAt:new Date().toISOString()
+  };
+}
+function applySynchronizedState(state) {
+  syncMeta={lessons:state.lessons||{},profile:state.profile||null};
+  completed=new Set();
+  completedAt={};
+  Object.entries(syncMeta.lessons).forEach(([id,item])=>{
+    if(item&&item.completed) {
+      completed.add(id);
+      if(item.date) completedAt[id]=item.date;
+    }
+  });
+  if(syncMeta.profile&&syncMeta.profile.value) localStorage.setItem(PROFILE_KEY,JSON.stringify(syncMeta.profile.value));
+  save(false); progress(); render();
+}
+
+const googleConnectBtn=document.getElementById("googleConnectBtn");
+const syncNowBtn=document.getElementById("syncNowBtn");
+const syncStatus=document.getElementById("syncStatus");
+window.GoogleDriveLearningSync.init({
+  clientId:window.LEARNING_HUB_GOOGLE_CLIENT_ID,
+  curriculumVersion:curriculum.version,
+  getState:currentSyncState,
+  applyState:applySynchronizedState,
+  onStatus:status=>{
+    syncStatus.textContent=status.message;
+    syncStatus.className="sync-status"+(status.state==="connected"?" good":status.state==="error"||status.state==="expired"?" bad":"");
+    const connected=status.state==="connected"||status.state==="syncing";
+    googleConnectBtn.textContent=status.state==="expired"?"Reconnect Google Drive":connected?"Google Drive connected":"Connect Google Drive";
+    googleConnectBtn.disabled=status.state==="connecting"||status.state==="syncing"||status.state==="connected";
+    syncNowBtn.hidden=!connected;
+    syncNowBtn.disabled=status.state==="syncing";
+  }
+});
+googleConnectBtn.addEventListener("click",()=>window.GoogleDriveLearningSync.connect());
+syncNowBtn.addEventListener("click",()=>window.GoogleDriveLearningSync.sync());
+
 progress(); render();
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+if ("serviceWorker" in navigator) {
+  let refreshing=false;
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{
+    if(refreshing) return;
+    refreshing=true;
+    location.reload();
+  });
+  navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(reg=>reg.update()).catch(()=>{});
+}
 </script>
 </body>
 </html>
