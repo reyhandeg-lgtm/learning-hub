@@ -43,6 +43,14 @@
     a.lesson{display:inline-block;text-decoration:none;background:var(--accent);color:white;border-radius:11px;padding:9px 12px;margin-top:7px;font-weight:600}
     .done .title{text-decoration:line-through;color:var(--muted)}
     .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+    dialog{width:min(92vw,520px);border:0;border-radius:18px;padding:0;box-shadow:0 18px 60px #0004}
+    dialog::backdrop{background:#0d1814aa}
+    .dialog-body{padding:20px}
+    .dialog-body h2{margin:0 0 5px;font-size:1.2rem}
+    .field{display:block;margin-top:14px;font-weight:700;font-size:.9rem}
+    .field input{display:block;width:100%;margin-top:5px;border:1px solid var(--border);border-radius:11px;padding:11px 12px;font:inherit}
+    .dialog-actions{display:flex;gap:9px;margin-top:20px}
+    .dialog-actions button{flex:1}
     .note{font-size:.84rem;color:var(--muted);margin-top:18px}
     #importFile{display:none}
     @media(max-width:520px){.toolbar{grid-template-columns:1fr} .stats{gap:7px} .stat{padding:10px}}
@@ -76,6 +84,7 @@
   <div id="list"></div>
 
   <div class="actions">
+    <button class="small primary" id="reportBtn">Export learning report (PDF)</button>
     <button class="small" id="exportBtn">Export progress</button>
     <label class="filelabel">Import progress<input type="file" id="importFile" accept="application/json"></label>
     <button class="small" id="resetBtn">Reset progress</button>
@@ -83,14 +92,34 @@
   <div class="note">Progress is stored on this device/browser. Export a backup occasionally if you want an easy restore option.</div>
 </div>
 
+<dialog id="reportDialog">
+  <form method="dialog" class="dialog-body" id="reportForm">
+    <h2>Create learning report</h2>
+    <div class="sub">Your details are saved only on this device and appear at the top of the PDF.</div>
+    <label class="field">Full name<input id="learnerName" autocomplete="name" required maxlength="80"></label>
+    <label class="field">Job title or team (optional)<input id="learnerTitle" maxlength="120" placeholder="e.g., R&amp;D Product Development"></label>
+    <div class="dialog-actions">
+      <button value="cancel" type="button" id="cancelReport">Cancel</button>
+      <button value="create" class="primary" type="submit">Create PDF</button>
+    </div>
+  </form>
+</dialog>
+
 <script src="curriculum.js"></script>
+<script src="jspdf.umd.min.js"></script>
+<script src="report.js"></script>
 <script>
 const curriculum = window.LEARNING_HUB_CURRICULUM;
 const lessons = curriculum.lessons;
 const KEY = "dispersant-learning-v1";
+const DATE_KEY = "dispersant-learning-completed-at-v1";
+const PROFILE_KEY = "learning-hub-report-profile-v1";
 let completed;
 try { completed = new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); }
 catch { completed = new Set(); }
+let completedAt;
+try { completedAt = JSON.parse(localStorage.getItem(DATE_KEY) || "{}"); }
+catch { completedAt = {}; }
 const list = document.getElementById("list");
 const track = document.getElementById("track");
 const mode = document.getElementById("mode");
@@ -104,6 +133,7 @@ function esc(value) {
 
 function save() {
   localStorage.setItem(KEY, JSON.stringify([...completed]));
+  localStorage.setItem(DATE_KEY, JSON.stringify(completedAt));
 }
 function progress() {
   const n=lessons.filter(x => completed.has(x.id)).length, t=lessons.length, p=t ? Math.round(n/t*100) : 0;
@@ -127,7 +157,13 @@ function render() {
           <a class="lesson" href="${esc(x.url)}" target="_blank" rel="noopener">Open lesson ↗</a>
         </div></div>`;
       c.querySelector("input").addEventListener("change", e => {
-        e.target.checked ? completed.add(x.id) : completed.delete(x.id);
+        if(e.target.checked) {
+          completed.add(x.id);
+          if(!completedAt[x.id]) completedAt[x.id]=new Date().toISOString();
+        } else {
+          completed.delete(x.id);
+          delete completedAt[x.id];
+        }
         save(); progress(); render();
       });
       list.appendChild(c);
@@ -147,7 +183,7 @@ track.addEventListener("change", render);
 mode.addEventListener("change", render);
 
 exportBtn.addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify({completed:[...completed], curriculumVersion:curriculum.version, exported:new Date().toISOString()},null,2)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({completed:[...completed], completedAt, curriculumVersion:curriculum.version, exported:new Date().toISOString()},null,2)], {type:"application/json"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="learning-hub-progress.json"; a.click(); URL.revokeObjectURL(a.href);
 });
 importFile.addEventListener("change", async e => {
@@ -155,12 +191,44 @@ importFile.addEventListener("change", async e => {
   try {
     const data=JSON.parse(await f.text());
     completed=new Set(data.completed||[]);
+    completedAt=data.completedAt&&typeof data.completedAt==="object" ? data.completedAt : {};
     save(); progress(); render();
   } catch { alert("Could not read that progress file."); }
   e.target.value="";
 });
 resetBtn.addEventListener("click", () => {
-  if(confirm("Reset all completed lessons?")) { completed.clear(); save(); progress(); render(); }
+  if(confirm("Reset all completed lessons?")) { completed.clear(); completedAt={}; save(); progress(); render(); }
+});
+
+const reportDialog=document.getElementById("reportDialog");
+const reportForm=document.getElementById("reportForm");
+const reportBtnEl=document.getElementById("reportBtn");
+const cancelReportEl=document.getElementById("cancelReport");
+const learnerNameEl=document.getElementById("learnerName");
+const learnerTitleEl=document.getElementById("learnerTitle");
+reportBtnEl.addEventListener("click", () => {
+  if(!lessons.some(x=>completed.has(x.id))) { alert("Complete at least one lesson before creating a report."); return; }
+  let profile={};
+  try { profile=JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}"); } catch {}
+  learnerNameEl.value=profile.name||"";
+  learnerTitleEl.value=profile.title||"";
+  reportDialog.showModal();
+  setTimeout(()=>learnerNameEl.focus(),50);
+});
+cancelReportEl.addEventListener("click",()=>reportDialog.close());
+reportForm.addEventListener("submit", e => {
+  e.preventDefault();
+  const profile={name:learnerNameEl.value.trim(),title:learnerTitleEl.value.trim()};
+  if(!profile.name) { learnerNameEl.focus(); return; }
+  localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));
+  try {
+    const doc=window.buildLearningReport({curriculum,completedIds:[...completed],completedAt,learner:profile,generatedAt:new Date().toISOString()});
+    const safeName=profile.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"learning";
+    doc.save(`${safeName}-learning-record.pdf`);
+    reportDialog.close();
+  } catch(err) {
+    alert("Could not create the PDF report. Please reload the app and try again.");
+  }
 });
 
 progress(); render();
