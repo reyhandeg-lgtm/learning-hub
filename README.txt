@@ -7,6 +7,8 @@ Files:
 - google-drive-sync.js (Google Drive synchronization)
 - video-player.html (reusable native iPhone video player)
 - forecasting-demand-overview.mp4 (optimized local training video)
+- business-case-financial-analysis-overview.mp4 (optimized track overview)
+- building-financial-projections.mp4 (native financial-projections video)
 - report.js and jspdf.umd.min.js (PDF learning reports)
 - manifest.json
 - sw.js
@@ -34,6 +36,7 @@ label and URL for each choice. Both choices remain under one trackable lesson re
 Local MP4 lessons use video-player.html so iPhone can use its native full-screen player.
 Keep each MP4 below GitHub's 25 MiB browser-upload limit and do not add MP4 files to the
 service-worker ASSETS list; videos stream on demand rather than downloading at install.
+Optional references arrays appear as compact expandable source lists beneath lesson buttons.
 
 Note:
 Opening index.html directly from the iPhone Files app is fine for inspection, but the PWA/service-worker

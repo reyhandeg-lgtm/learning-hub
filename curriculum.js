@@ -5,7 +5,7 @@
  * Keep lesson IDs stable after release so saved completion progress is preserved.
  */
 window.LEARNING_HUB_CURRICULUM = {
-  version: "2026.08.4",
+  version: "2026.08.6",
   tracks: [
     {
       id: "business",
@@ -24,6 +24,53 @@ window.LEARNING_HUB_CURRICULUM = {
     }
   ],
   lessons: [
+    {
+      id: "bc-track-overview",
+      track: "business",
+      title: "Business Case and Financial Analysis Overview",
+      source: "Customized NotebookLM overview from MIT and Farhat Lectures materials",
+      creator: "NotebookLM overview based on the listed source creators",
+      credentials: "AI-generated overview synthesized from MIT OpenCourseWare, MIT 2.009 materials by Prof. Steven D. Eppinger, and capital-budgeting instruction from Farhat Lectures. This is a curated overview, not an official certificate or course from the source providers.",
+      url: "video-player.html?src=business-case-financial-analysis-overview.mp4&title=Business%20Case%20and%20Financial%20Analysis%20Overview",
+      resources: [
+        {
+          label: "Watch track overview",
+          url: "video-player.html?src=business-case-financial-analysis-overview.mp4&title=Business%20Case%20and%20Financial%20Analysis%20Overview",
+          type: "video",
+          duration: "~9 min"
+        }
+      ],
+      references: [
+        {
+          title: "Capital Budgeting Explained",
+          source: "Farhat Lectures",
+          url: "https://www.youtube.com/watch?v=ppnjUicPHV0&list=PLxP0KZzCGFYMo0_H0qTAS2qnLlYOFwMlw"
+        },
+        {
+          title: "Product Definition & Development to Delivery",
+          source: "MIT 15.390 New Enterprises — Howard Anderson and Bill Aulet",
+          url: "https://ocw.mit.edu/courses/15-390-new-enterprises-spring-2013/85d18c5f1ce4ade7415c75be670dd0c0_MIT15_390S13_lec19.pdf"
+        },
+        {
+          title: "Product Development Economics",
+          source: "MIT 2.009 — Prof. Steven D. Eppinger",
+          url: "https://web.mit.edu/2.009/www/resources/ProductDevelopmentEconomics.pdf"
+        },
+        {
+          title: "How Are You Going to Make Money?—The Business/Venture Model",
+          source: "MIT Nuts and Bolts of New Ventures",
+          url: "https://www.youtube.com/watch?v=wzC4PddpFnA"
+        },
+        {
+          title: "Financial Projections",
+          source: "MIT Nuts and Bolts of New Ventures",
+          url: "https://www.youtube.com/watch?v=YweBomE2cr4"
+        }
+      ],
+      duration: "~9 min",
+      mode: "Watch",
+      description: "Start here for a concise map of product economics, business models, development and launch investment, cash-flow projections, NPV and IRR, risk, and go/no-go decision logic."
+    },
     {
       id: "bc-demand-forecasting",
       track: "business",
@@ -53,14 +100,28 @@ window.LEARNING_HUB_CURRICULUM = {
     {
       id: "bc-financial-projections",
       track: "business",
-      title: "Financial Projections for a New Venture",
-      source: "MIT OpenCourseWare · 2025",
-      creator: "Steve Derezinski",
-      credentials: "MIT S.B. in Mechanical Engineering; MIT Sloan MBA and Sloan Fellow; venture builder and former founder of GT VentureLab.",
+      title: "Building Financial Projections",
+      source: "MIT OpenCourseWare · 2025 + NotebookLM overview",
+      creator: "Steve Derezinski (source lesson)",
+      credentials: "MIT S.B. in Mechanical Engineering; MIT Sloan MBA and Sloan Fellow; venture builder and former founder of GT VentureLab. The optional video is an AI-generated NotebookLM overview of the source lesson.",
       url: "https://ocw.mit.edu/courses/15-393-nuts-and-bolts-of-new-ventures-january-iap-2025/mit15_393_iap25_session5_part2_derezinski.pdf",
-      duration: "20–30 min",
-      mode: "Focused Study",
-      description: "Translate volume, price, cost, and investment assumptions into revenue, margin, cash flow, and funding needs."
+      resources: [
+        {
+          label: "Read presentation",
+          url: "https://ocw.mit.edu/courses/15-393-nuts-and-bolts-of-new-ventures-january-iap-2025/mit15_393_iap25_session5_part2_derezinski.pdf",
+          type: "reading",
+          duration: "20–30 min"
+        },
+        {
+          label: "Watch overview video",
+          url: "video-player.html?src=building-financial-projections.mp4&title=Building%20Financial%20Projections",
+          type: "video",
+          duration: "~9 min"
+        }
+      ],
+      duration: "~9 min video / 20–30 min reading",
+      mode: "Watch or Focused Study",
+      description: "Translate volume, price, cost, staffing, and investment assumptions into revenue, margin, cash flow, runway, and funding needs. Choose the short NotebookLM overview, the full MIT presentation, or both."
     },
     {
       id: "bc-capital-budgeting-1",

@@ -50,6 +50,9 @@
     .lesson-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:7px}
     .lesson-links a.lesson{margin-top:0}
     .lesson-links a.secondary{background:var(--card);color:var(--accent);border:1px solid var(--accent)}
+    .source-list{margin-top:10px;color:var(--muted);font-size:.86rem}
+    .source-list summary{cursor:pointer;color:var(--accent);font-weight:700}
+    .source-list ul{margin:7px 0 0;padding-left:19px}.source-list li{margin:5px 0}.source-list a{color:var(--accent)}
     .done .title{text-decoration:line-through;color:var(--muted)}
     .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
     dialog{width:min(92vw,520px);border:0;border-radius:18px;padding:0;box-shadow:0 18px 60px #0004}
@@ -180,6 +183,13 @@ function resourceLinks(lesson,actionPrefix="") {
     return `<a class="lesson${index?" secondary":""}" href="${esc(resource.url)}" target="${localVideo?"_self":"_blank"}" rel="noopener">${esc(resource.label||"Open lesson")} ${localVideo?"▶":"↗"}</a>`;
   }).join("")}</div>`;
 }
+function sourceReferences(lesson) {
+  const references=Array.isArray(lesson.references)?lesson.references:[];
+  if(!references.length) return "";
+  return `<details class="source-list"><summary>Source materials (${references.length})</summary><ul>${references.map(reference=>
+    `<li><a href="${esc(reference.url)}" target="_blank" rel="noopener">${esc(reference.title)}</a>${reference.source?` — ${esc(reference.source)}`:""}</li>`
+  ).join("")}</ul></details>`;
+}
 
 function save(shouldSync=true) {
   localStorage.setItem(SYNC_META_KEY,JSON.stringify(syncMeta));
@@ -220,6 +230,7 @@ function render() {
           <div class="sub">${esc(x.description)}</div>
           <div class="meta"><span class="chip">${esc(x.duration)}</span><span class="chip">${esc(x.mode)}</span><span>${esc(x.source)}</span></div>
           ${resourceLinks(x)}
+          ${sourceReferences(x)}
           ${completed.has(x.id)?`<label class="completion-date">Completion date <input class="date-editor" type="date" value="${esc(dateInputValue(completedAt[x.id]))}" aria-label="Completion date for ${esc(x.title)}"></label>`:""}
         </div></div>`;
       c.querySelector('input[type="checkbox"]').addEventListener("change", e => {
