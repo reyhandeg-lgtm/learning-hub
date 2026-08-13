@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#1f5c4a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Dispersant Learning">
+  <meta name="apple-mobile-web-app-title" content="Learning Hub">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <title>Dispersant Learning</title>
+  <title>Personal Learning Hub</title>
   <style>
     :root {
       --bg:#f6f7f5; --card:#ffffff; --text:#17211d; --muted:#66726c;
@@ -20,6 +20,7 @@
     .wrap{max-width:760px;margin:auto;padding:20px 16px 48px}
     h1{font-size:1.55rem;margin:0 0 4px} h2{font-size:1.08rem;margin:24px 0 10px}
     .sub{color:var(--muted);font-size:.93rem}
+    .eyebrow{color:var(--accent);font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
     .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
     .stat,.card{background:var(--card);border:1px solid var(--border);border-radius:16px}
     .stat{padding:12px} .stat b{display:block;font-size:1.35rem;margin-top:2px}
@@ -30,7 +31,8 @@
     button.primary{background:var(--accent);color:white;border-color:var(--accent)}
     button.small,.filelabel{width:auto;padding:8px 10px;font-size:.9rem}
     .next{padding:14px 15px;background:var(--accent2);border-radius:14px;margin:16px 0}
-    .section-title{margin-top:22px;font-weight:700}
+    .section-title{margin-top:24px;font-size:1.05rem;font-weight:800}
+    .section-summary{color:var(--muted);font-size:.9rem;margin:3px 0 11px}
     .card{padding:14px;margin:9px 0}
     .row{display:flex;gap:12px;align-items:flex-start}
     input[type=checkbox]{width:22px;height:22px;margin-top:2px;accent-color:var(--accent)}
@@ -48,8 +50,9 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Dispersant Learning</h1>
-  <div class="sub">PCE chemistry • surfactants • air/defoamers • business-case development</div>
+  <div class="eyebrow">Practical work learning</div>
+  <h1>Personal Learning Hub</h1>
+  <div class="sub">Short, curated paths for product decisions and admixture chemistry</div>
 
   <div class="stats">
     <div class="stat"><span class="sub">Completed</span><b id="done">0</b></div>
@@ -61,16 +64,9 @@
   <div class="toolbar">
     <select id="track">
       <option value="All">All tracks</option>
-      <option>Business Case</option>
-      <option>PCE / Polymer</option>
-      <option>Air / Defoamer</option>
     </select>
     <select id="mode">
       <option value="All">Any learning mode</option>
-      <option>Good for Walking</option>
-      <option>Mostly Listen</option>
-      <option>Watch</option>
-      <option>Focus</option>
     </select>
   </div>
 
@@ -87,36 +83,48 @@
   <div class="note">Progress is stored on this device/browser. Export a backup occasionally if you want an easy restore option.</div>
 </div>
 
+<script src="curriculum.js"></script>
 <script>
-const lessons = [{"id": "business-case", "track": "Business Case", "title": "Create Compelling Business Cases", "source": "Coursera", "url": "https://www.coursera.org/learn/create-compelling-business-cases", "duration": "~4 hr total", "mode": "Focus", "description": "Business-case structure, stakeholders, risk, ROI/payback, financial analysis, and executive summary."}, {"id": "polymer-structure", "track": "PCE / Polymer", "title": "Polymer Nomenclature and Structure", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=QYCpo-C-dHo", "duration": "~48 min", "mode": "Mostly Listen", "description": "Polymer architecture vocabulary and structural differences relevant to PCE raw materials."}, {"id": "polymer-size-shape", "track": "PCE / Polymer", "title": "Polymer Size and Shape", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=Pxk1MO5jBrU", "duration": "~45 min", "mode": "Watch", "description": "Chain conformation, size, shape, and how molecular architecture affects behavior."}, {"id": "molecular-weight", "track": "PCE / Polymer", "title": "Molecular Weight Measurements", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=87kBD_xsOh4", "duration": "~39 min", "mode": "Watch", "description": "Molecular-weight averages, distributions, intrinsic viscosity, and why MW data need context."}, {"id": "surface-tension", "track": "Air / Defoamer", "title": "Surface Energy and Surface Tension", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=rlwcM9IorUw", "duration": "~26 min", "mode": "Mostly Listen", "description": "Physical basis of surface tension and the air\u2013water interface."}, {"id": "surfactant-background", "track": "Air / Defoamer", "title": "Surfactant Background, Examples and Structure", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=t7W9kNCkRtQ", "duration": "~33 min", "mode": "Good for Walking", "description": "How amphiphilic structure drives adsorption and interfacial behavior."}, {"id": "micelles-cmc", "track": "Air / Defoamer", "title": "Micelle Formation, CMC, Krafft Temperature and Cloud Point", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=jCHjZIrf2Pg", "duration": "~32 min", "mode": "Watch", "description": "Micellization and the meaning of critical micelle concentration."}, {"id": "hydrophobic-colloids", "track": "PCE / Polymer", "title": "Hydrophobic Colloids, Particle Size and Settling Stability", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=vcAZvk091_c", "duration": "~35 min", "mode": "Mostly Listen", "description": "A bridge from polymer/surfactant fundamentals into colloidal particle behavior."}, {"id": "foams", "track": "Air / Defoamer", "title": "Introduction to Foams", "source": "University of Minnesota \u2013 Severtson Lab", "url": "https://www.youtube.com/watch?v=62czT-p7JLE", "duration": "~35 min", "mode": "Mostly Listen", "description": "Foam films, drainage, stability, and the physical basis for persistent air."}, {"id": "mit-interfaces", "track": "Air / Defoamer", "title": "Interfacial Phenomena \u2014 Selected Deep Dives", "source": "MIT OpenCourseWare", "url": "https://ocw.mit.edu/courses/18-357-interfacial-phenomena-fall-2010/", "duration": "Choose selected topics", "mode": "Focus", "description": "Graduate-level material on drops, bubbles, surfactants, wetting, Marangoni effects, and interfacial tension."}];
+const curriculum = window.LEARNING_HUB_CURRICULUM;
+const lessons = curriculum.lessons;
 const KEY = "dispersant-learning-v1";
-let completed = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
+let completed;
+try { completed = new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); }
+catch { completed = new Set(); }
 const list = document.getElementById("list");
 const track = document.getElementById("track");
 const mode = document.getElementById("mode");
+
+for (const x of curriculum.tracks) track.add(new Option(x.name, x.id));
+for (const x of [...new Set(lessons.map(x => x.mode))]) mode.add(new Option(x, x));
+
+function esc(value) {
+  return String(value).replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+}
 
 function save() {
   localStorage.setItem(KEY, JSON.stringify([...completed]));
 }
 function progress() {
-  const n=completed.size, t=lessons.length, p=Math.round(n/t*100);
+  const n=lessons.filter(x => completed.has(x.id)).length, t=lessons.length, p=t ? Math.round(n/t*100) : 0;
   done.textContent=n; total.textContent=t; pct.textContent=p+"%"; bar.style.width=p+"%";
 }
 function render() {
   list.innerHTML="";
   const filtered=lessons.filter(x => (track.value==="All"||x.track===track.value) && (mode.value==="All"||x.mode===mode.value));
-  const groups=[...new Set(filtered.map(x=>x.track))];
+  const groups=curriculum.tracks.filter(x => filtered.some(y => y.track===x.id));
   for (const g of groups) {
-    const h=document.createElement("div"); h.className="section-title"; h.textContent=g; list.appendChild(h);
-    for (const x of filtered.filter(y=>y.track===g)) {
+    const h=document.createElement("div"); h.className="section-title"; h.textContent=g.name; list.appendChild(h);
+    const s=document.createElement("div"); s.className="section-summary"; s.textContent=g.summary; list.appendChild(s);
+    for (const x of filtered.filter(y=>y.track===g.id)) {
       const c=document.createElement("div"); c.className="card"+(completed.has(x.id)?" done":"");
       c.innerHTML=`<div class="row">
-        <input type="checkbox" aria-label="Mark ${x.title} complete" ${completed.has(x.id)?"checked":""}>
+        <input type="checkbox" aria-label="Mark ${esc(x.title)} complete" ${completed.has(x.id)?"checked":""}>
         <div class="grow">
-          <div class="title">${x.title}</div>
-          <div class="sub">${x.description}</div>
-          <div class="meta"><span class="chip">${x.duration}</span><span class="chip">${x.mode}</span><span>${x.source}</span></div>
-          <a class="lesson" href="${x.url}" target="_blank" rel="noopener">Open lesson ↗</a>
+          <div class="title">${esc(x.title)}</div>
+          <div class="sub">${esc(x.description)}</div>
+          <div class="meta"><span class="chip">${esc(x.duration)}</span><span class="chip">${esc(x.mode)}</span><span>${esc(x.source)}</span></div>
+          <a class="lesson" href="${esc(x.url)}" target="_blank" rel="noopener">Open lesson ↗</a>
         </div></div>`;
       c.querySelector("input").addEventListener("change", e => {
         e.target.checked ? completed.add(x.id) : completed.delete(x.id);
@@ -131,7 +139,7 @@ function showNext() {
   const filtered=lessons.filter(x => (track.value==="All"||x.track===track.value) && (mode.value==="All"||x.mode===mode.value));
   const x=filtered.find(y=>!completed.has(y.id));
   nextBox.innerHTML = x
-    ? `<b>${x.title}</b><br><span class="sub">${x.duration} • ${x.mode} • ${x.source}</span><br><a class="lesson" href="${x.url}" target="_blank" rel="noopener">Start lesson ↗</a>`
+    ? `<b>${esc(x.title)}</b><br><span class="sub">${esc(x.duration)} • ${esc(x.mode)} • ${esc(x.source)}</span><br><a class="lesson" href="${esc(x.url)}" target="_blank" rel="noopener">Start lesson ↗</a>`
     : `<b>All matching lessons are complete.</b>`;
 }
 nextBtn.addEventListener("click", showNext);
@@ -139,8 +147,8 @@ track.addEventListener("change", render);
 mode.addEventListener("change", render);
 
 exportBtn.addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify({completed:[...completed], exported:new Date().toISOString()},null,2)], {type:"application/json"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="dispersant-learning-progress.json"; a.click(); URL.revokeObjectURL(a.href);
+  const blob = new Blob([JSON.stringify({completed:[...completed], curriculumVersion:curriculum.version, exported:new Date().toISOString()},null,2)], {type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="learning-hub-progress.json"; a.click(); URL.revokeObjectURL(a.href);
 });
 importFile.addEventListener("change", async e => {
   const f=e.target.files[0]; if(!f) return;

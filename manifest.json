@@ -1,6 +1,6 @@
 {
-  "name": "Dispersant Learning",
-  "short_name": "Dispersant",
+  "name": "Personal Learning Hub",
+  "short_name": "Learning Hub",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f6f7f5",
