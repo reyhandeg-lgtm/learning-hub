@@ -232,41 +232,47 @@ window.LEARNING_HUB_CURRICULUM = {
       course: "mit-ids333",
       module: 2,
       track: "business",
-      title: "DCF and Simulation Under Uncertainty",
-      source: "MIT OpenCourseWare · IDS.333 Units 3 and 5",
+      title: "Discounted Cash Flow for Product Decisions",
+      source: "MIT OpenCourseWare · IDS.333 Unit 3",
       creator: "Prof. Richard de Neufville",
-      credentials: "MIT Professor of Engineering Systems; specialist in engineering design, uncertainty, flexibility, and decision analysis.",
+      credentials: "MIT Professor of Engineering Systems; specialist in engineering design, uncertainty, flexibility, and decision analysis. The general-admixture and FRWR audio/video items are AI-generated NotebookLM overviews of the cited MIT materials; practical admixture examples are interpretations, not MIT course findings.",
       url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/unit-orientations/",
       resources: [
         {
           label: "Listen to overview",
-          url: "audio-player.html?src=ids333-module2-audio-overview.ogg&title=Module%202%3A%20Valuing%20Financial%20Flexibility%20with%20Monte%20Carlo%20Simulation",
+          url: "audio-player.html?src=ids333-module2-audio-overview.m4a&title=Module%202%3A%20The%20Financial%20Clock%20for%20Concrete%20Admixtures",
           type: "audio",
-          duration: "62:39"
+          duration: "23:11"
         },
         {
           label: "Watch overview",
-          url: "video-player.html?src=ids333-module2-video-overview.mp4&title=Module%202%3A%20Mastering%20Launch%20Uncertainty",
+          url: "video-player.html?src=ids333-module2-video-overview.mp4&title=Module%202%3A%20DCF%20for%20Admixture%20Managers",
           type: "video",
-          duration: "7:40"
+          duration: "8:05"
         },
         {
-          label: "Watch MIT lessons",
+          label: "Watch FRWR applied example",
+          url: "video-player.html?src=ids333-module2-frwr-video-overview.mp4&title=Module%202%3A%20FRWR%20Applied%20Example%20%E2%80%94%20Discounted%20Cash%20Flow",
+          type: "video",
+          duration: "6:16"
+        },
+        {
+          label: "Listen to FRWR applied example",
+          url: "audio-player.html?src=ids333-module2-frwr-audio-overview.m4a&title=Module%202%3A%20FRWR%20Applied%20Example%20%E2%80%94%20DCF%20Business%20Case",
+          type: "audio",
+          duration: "51:50"
+        },
+        {
+          label: "Watch MIT Unit 3 lessons",
           url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/video_galleries/videos/",
           type: "video",
-          duration: "~51 min"
+          duration: "Choose Unit 3"
         },
         {
           label: "View DCF lecture deck",
           url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/mit_ids_333f21_lec3.pdf",
           type: "reading",
           duration: "15–20 min"
-        },
-        {
-          label: "View simulation deck",
-          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/mit_ids_333f21_lec5.pdf",
-          type: "reading",
-          duration: "10–15 min"
         }
       ],
       references: [
@@ -276,14 +282,14 @@ window.LEARNING_HUB_CURRICULUM = {
           url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/assignment-2/"
         },
         {
-          title: "Unit 5 orientation — Simulation Mechanics",
-          source: "MIT OpenCourseWare",
-          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/assignment-5/"
-        },
-        {
-          title: "Units 3 and 5 lecture videos",
+          title: "Unit 3 lecture videos",
           source: "MIT OpenCourseWare",
           url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/video_galleries/videos/"
+        },
+        {
+          title: "Chapter 11 — Discounted Cash Flow Analysis",
+          source: "MIT Engineering Systems Analysis for Design",
+          url: "https://web.mit.edu/ardent/www/ASA_Text/asa_ch11.pdf"
         },
         {
           title: "DCF Analysis Introduction and DCF Mechanics — lecture deck",
@@ -291,14 +297,19 @@ window.LEARNING_HUB_CURRICULUM = {
           url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/mit_ids_333f21_lec3.pdf"
         },
         {
-          title: "Mechanics of Simulation — lecture deck",
-          source: "MIT OpenCourseWare",
-          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/mit_ids_333f21_lec5.pdf"
+          title: "Chapter 12 — Measures of Economic Performance",
+          source: "MIT Engineering Systems Analysis for Design",
+          url: "https://web.mit.edu/ardent/www/ASA_Text/asa_ch12.pdf"
+        },
+        {
+          title: "Chapter 13 — Decision Criteria and Comparisons",
+          source: "MIT Engineering Systems Analysis for Design",
+          url: "https://web.mit.edu/ardent/www/ASA_Text/asa_ch13.pdf"
         }
       ],
-      duration: "Choose an overview, then study the MIT lessons and decks as needed",
+      duration: "23 min audio / 8 min video, plus optional FRWR applied examples",
       mode: "Mixed Media",
-      description: "Use discounted cash flow and simulation to represent ranges of financial outcomes rather than relying only on one deterministic business case."
+      description: "Use dated cash flows, the time value of money, present value, and NPV to evaluate concrete-admixture development and launch decisions while separating MIT course concepts from practical product-management interpretations."
     },
     {
       id: "bc-ids333-flexibility",
