@@ -5,7 +5,7 @@
  * Keep lesson IDs stable after release so saved completion progress is preserved.
  */
 window.LEARNING_HUB_CURRICULUM = {
-  version: "2026.08.6",
+  version: "2026.08.14",
   tracks: [
     {
       id: "business",
@@ -21,6 +21,17 @@ window.LEARNING_HUB_CURRICULUM = {
       id: "air",
       name: "Air / Surfactants / Defoamers",
       summary: "Interfaces, micelles, foam stability, and the molecular mechanisms of foam control."
+    }
+  ],
+  courses: [
+    {
+      id: "mit-ids333",
+      track: "business",
+      title: "MIT Risk and Decision Analysis",
+      source: "MIT OpenCourseWare · IDS.333 · Fall 2021",
+      creator: "Prof. Richard de Neufville",
+      description: "A four-module learning series on forecasting error, simulation, flexibility, decision analysis, value of information, and multidimensional evaluation.",
+      totalModules: 4
     }
   ],
   lessons: [
@@ -160,16 +171,139 @@ window.LEARNING_HUB_CURRICULUM = {
       description: "Opens the MIT PDF directly. See how sensitivity tables reveal the volume, price, variable-cost, CAPEX, and discount-rate assumptions that drive the recommendation."
     },
     {
-      id: "bc-risk-decision",
+      id: "bc-ids333-forecasting",
+      course: "mit-ids333",
+      module: 1,
       track: "business",
-      title: "Decision Analysis Under Uncertainty",
-      source: "MIT OpenCourseWare",
+      title: "Forecasting and the Flaw of Averages",
+      source: "MIT OpenCourseWare · IDS.333 Unit 2",
+      creator: "Prof. Richard de Neufville",
+      credentials: "MIT Professor of Engineering Systems; specialist in engineering design, uncertainty, flexibility, and decision analysis.",
+      url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/video_galleries/videos/",
+      resources: [
+        {
+          label: "Listen to overview",
+          url: "audio-player.html?src=ids333-module1-audio-overview.m4a&title=Module%201%3A%20Why%20Your%20Admixture%20Forecasts%20Are%20Wrong",
+          type: "audio",
+          duration: "47:44"
+        },
+        {
+          label: "Watch overview",
+          url: "video-player.html?src=ids333-module1-video-overview.mp4&title=Module%201%3A%20Escaping%20the%20Forecasting%20Trap",
+          type: "video",
+          duration: "7:43"
+        },
+        {
+          label: "Watch MIT lessons",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/video_galleries/videos/",
+          type: "video",
+          duration: "~42 min"
+        },
+        {
+          label: "View lecture deck",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/mit_ids_333f21_lec2.pdf",
+          type: "reading",
+          duration: "15–20 min"
+        }
+      ],
+      references: [
+        {
+          title: "Unit 2 orientation — Forecast Is Always Wrong",
+          source: "MIT OpenCourseWare",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/orientation-2/"
+        },
+        {
+          title: "Unit 2 lecture videos",
+          source: "MIT OpenCourseWare",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/video_galleries/videos/"
+        },
+        {
+          title: "The Forecast Is Always Wrong — lecture deck",
+          source: "MIT OpenCourseWare",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/mit_ids_333f21_lec2.pdf"
+        }
+      ],
+      duration: "Choose an overview, then study the MIT lessons and deck as needed",
+      mode: "Mixed Media",
+      description: "Recognize why point forecasts of cost, price, production, demand, and timing miss actual outcomes; interpret porcupine graphs; and avoid decisions built around a misleading average."
+    },
+    {
+      id: "bc-ids333-dcf-simulation",
+      course: "mit-ids333",
+      module: 2,
+      track: "business",
+      title: "DCF and Simulation Under Uncertainty",
+      source: "MIT OpenCourseWare · IDS.333 Units 3 and 5",
+      creator: "Prof. Richard de Neufville",
+      credentials: "MIT Professor of Engineering Systems; specialist in engineering design, uncertainty, flexibility, and decision analysis.",
+      url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/unit-orientations/",
+      resources: [
+        {
+          label: "Explore Units 3 and 5",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/unit-orientations/",
+          type: "reading"
+        },
+        {
+          label: "Watch MIT lessons",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/video_galleries/videos/",
+          type: "video"
+        }
+      ],
+      duration: "90–120 min",
+      mode: "Mixed Media",
+      description: "Use discounted cash flow and simulation to represent ranges of financial outcomes rather than relying only on one deterministic business case."
+    },
+    {
+      id: "bc-ids333-flexibility",
+      course: "mit-ids333",
+      module: 3,
+      track: "business",
+      title: "Designing for Flexibility: The Parking Garage Case",
+      source: "MIT OpenCourseWare · IDS.333 Units 4 and 7",
+      creator: "Prof. Richard de Neufville",
+      credentials: "MIT Professor of Engineering Systems; specialist in engineering design, uncertainty, flexibility, and decision analysis.",
+      url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/unit-orientations/",
+      resources: [
+        {
+          label: "Explore Units 4 and 7",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/unit-orientations/",
+          type: "reading"
+        },
+        {
+          label: "Watch MIT case lessons",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/video_galleries/videos/",
+          type: "video"
+        }
+      ],
+      duration: "90–120 min",
+      mode: "Mixed Media",
+      description: "Use the parking-garage case to understand how staged capacity and managerial flexibility can improve outcomes when future demand is uncertain."
+    },
+    {
+      id: "bc-risk-decision",
+      course: "mit-ids333",
+      module: 4,
+      track: "business",
+      title: "Decision, Information, and Utility Analysis",
+      source: "MIT OpenCourseWare · IDS.333 Units 8–10",
       creator: "Prof. Richard de Neufville",
       credentials: "MIT Professor of Engineering Systems; specialist in engineering design, uncertainty, flexibility, and decision analysis.",
       url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/assignment-8/",
-      duration: "20–30 min",
-      mode: "Focused Study",
-      description: "Use decision trees, scenarios, and value of information to frame a practical go/no-go recommendation when inputs are uncertain."
+      resources: [
+        {
+          label: "Explore decision analysis",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/assignment-8/",
+          type: "reading"
+        },
+        {
+          label: "Watch MIT lessons",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/video_galleries/videos/",
+          type: "video"
+        }
+      ],
+      duration: "120–150 min",
+      mode: "Mixed Media",
+      description: "Use decision trees, value of information, utility analysis, and multidimensional evaluation to compare uncertain alternatives and frame practical recommendations."
     },
 
     {
