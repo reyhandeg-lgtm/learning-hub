@@ -239,17 +239,64 @@ window.LEARNING_HUB_CURRICULUM = {
       url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/unit-orientations/",
       resources: [
         {
-          label: "Explore Units 3 and 5",
-          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/unit-orientations/",
-          type: "reading"
+          label: "Listen to overview",
+          url: "audio-player.html?src=ids333-module2-audio-overview.ogg&title=Module%202%3A%20Valuing%20Financial%20Flexibility%20with%20Monte%20Carlo%20Simulation",
+          type: "audio",
+          duration: "62:39"
+        },
+        {
+          label: "Watch overview",
+          url: "video-player.html?src=ids333-module2-video-overview.mp4&title=Module%202%3A%20Mastering%20Launch%20Uncertainty",
+          type: "video",
+          duration: "7:40"
         },
         {
           label: "Watch MIT lessons",
           url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/video_galleries/videos/",
-          type: "video"
+          type: "video",
+          duration: "~51 min"
+        },
+        {
+          label: "View DCF lecture deck",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/mit_ids_333f21_lec3.pdf",
+          type: "reading",
+          duration: "15–20 min"
+        },
+        {
+          label: "View simulation deck",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/mit_ids_333f21_lec5.pdf",
+          type: "reading",
+          duration: "10–15 min"
         }
       ],
-      duration: "90–120 min",
+      references: [
+        {
+          title: "Unit 3 orientation — Discounted Cash Flow",
+          source: "MIT OpenCourseWare",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/assignment-2/"
+        },
+        {
+          title: "Unit 5 orientation — Simulation Mechanics",
+          source: "MIT OpenCourseWare",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/assignment-5/"
+        },
+        {
+          title: "Units 3 and 5 lecture videos",
+          source: "MIT OpenCourseWare",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/video_galleries/videos/"
+        },
+        {
+          title: "DCF Analysis Introduction and DCF Mechanics — lecture deck",
+          source: "MIT OpenCourseWare",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/mit_ids_333f21_lec3.pdf"
+        },
+        {
+          title: "Mechanics of Simulation — lecture deck",
+          source: "MIT OpenCourseWare",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/mit_ids_333f21_lec5.pdf"
+        }
+      ],
+      duration: "Choose an overview, then study the MIT lessons and decks as needed",
       mode: "Mixed Media",
       description: "Use discounted cash flow and simulation to represent ranges of financial outcomes rather than relying only on one deterministic business case."
     },
