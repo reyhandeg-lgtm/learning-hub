@@ -5,7 +5,7 @@
  * Keep lesson IDs stable after release so saved completion progress is preserved.
  */
 window.LEARNING_HUB_CURRICULUM = {
-  version: "2026.08.14",
+  version: "2026.08.14-module3",
   tracks: [
     {
       id: "business",
@@ -308,23 +308,71 @@ window.LEARNING_HUB_CURRICULUM = {
       title: "Designing for Flexibility: The Parking Garage Case",
       source: "MIT OpenCourseWare · IDS.333 Units 4 and 7",
       creator: "Prof. Richard de Neufville",
-      credentials: "MIT Professor of Engineering Systems; specialist in engineering design, uncertainty, flexibility, and decision analysis.",
+      credentials: "MIT Professor of Engineering Systems; specialist in engineering design, uncertainty, flexibility, and decision analysis. The audio and video are AI-generated NotebookLM overviews of the cited MIT materials. The adapted Excel model reorganizes and explains the original MIT garage model for guided learning; it is not an official MIT release.",
       url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/unit-orientations/",
       resources: [
         {
-          label: "Explore Units 4 and 7",
-          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/unit-orientations/",
-          type: "reading"
+          label: "Listen to overview",
+          url: "audio-player.html?src=ids333-module3-audio-overview.m4a&title=Module%203%3A%20MIT%20Real%20Options%20for%20Flexible%20Manufacturing",
+          type: "audio",
+          duration: "43:18"
+        },
+        {
+          label: "Watch overview",
+          url: "video-player.html?src=ids333-module3-video-overview.mp4&title=Module%203%3A%20Defeating%20the%20Flaw%20of%20Averages",
+          type: "video",
+          duration: "7:32"
         },
         {
           label: "Watch MIT case lessons",
           url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/video_galleries/videos/",
-          type: "video"
+          type: "video",
+          duration: "Choose Units 4 and 7"
+        },
+        {
+          label: "Read garage case",
+          url: "https://web.mit.edu/deweck/Public/Alstom/deNeufville_et_al_2006.pdf",
+          type: "reading",
+          duration: "15–20 min"
+        },
+        {
+          label: "View lecture deck",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/mit_ids_333f21_lec4.pdf",
+          type: "reading",
+          duration: "20–30 min"
+        },
+        {
+          label: "Adapted Excel Model",
+          url: "ids333-module3-adapted-excel-model.xlsx",
+          type: "spreadsheet",
+          duration: "Hands-on exercise"
         }
       ],
-      duration: "90–120 min",
+      references: [
+        {
+          title: "Unit 4 — Parking Garage Case Example",
+          source: "MIT OpenCourseWare",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/pages/unit-orientations/"
+        },
+        {
+          title: "Units 4 and 7 lecture videos",
+          source: "MIT OpenCourseWare",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/video_galleries/videos/"
+        },
+        {
+          title: "Parking Garage Case — lecture deck and technical note",
+          source: "MIT OpenCourseWare",
+          url: "https://ocw.mit.edu/courses/ids-333-risk-and-decision-analysis-fall-2021/mit_ids_333f21_lec4.pdf"
+        },
+        {
+          title: "Real Options by Engineering Systems — concise published case",
+          source: "de Neufville, Scholtes, and Wang",
+          url: "https://web.mit.edu/deweck/Public/Alstom/deNeufville_et_al_2006.pdf"
+        }
+      ],
+      duration: "Choose an overview, then use the MIT lessons, readings, and adapted model as needed",
       mode: "Mixed Media",
-      description: "Use the parking-garage case to understand how staged capacity and managerial flexibility can improve outcomes when future demand is uncertain."
+      description: "Use the parking-garage case to see how uncertainty, nonlinear capacity constraints, staged investment, and managerial flexibility can improve downside protection while preserving upside opportunity."
     },
     {
       id: "bc-risk-decision",
