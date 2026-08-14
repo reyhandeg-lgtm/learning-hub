@@ -40,6 +40,12 @@
     .section-title{margin-top:24px;font-size:1.05rem;font-weight:800}
     .section-summary{color:var(--muted);font-size:.9rem;margin:3px 0 11px}
     .card{padding:14px;margin:9px 0}
+    .course-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px;margin:12px 0}
+    .course-head{padding:2px 2px 10px}
+    .course-title{font-size:1.03rem;font-weight:800}
+    .course-progress{color:var(--accent);font-size:.86rem;font-weight:700;margin-top:5px}
+    .module-card{margin:8px 0 0;background:#fafcfb;border-radius:13px}
+    .module-label{color:var(--accent);font-size:.75rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
     .row{display:flex;gap:12px;align-items:flex-start}
     input[type=checkbox]{width:22px;height:22px;margin-top:2px;accent-color:var(--accent)}
     .grow{flex:1;min-width:0}
@@ -78,7 +84,7 @@
 
   <div class="stats">
     <div class="stat"><span class="sub">Completed</span><b id="done">0</b></div>
-    <div class="stat"><span class="sub">Lessons</span><b id="total">0</b></div>
+    <div class="stat"><span class="sub">Learning items</span><b id="total">0</b></div>
     <div class="stat"><span class="sub">Progress</span><b id="pct">0%</b></div>
   </div>
   <div class="progress"><div class="bar" id="bar"></div></div>
@@ -136,6 +142,8 @@
 <script>
 const curriculum = window.LEARNING_HUB_CURRICULUM;
 const lessons = curriculum.lessons;
+const courses = Array.isArray(curriculum.courses) ? curriculum.courses : [];
+const courseById = new Map(courses.map(x => [x.id, x]));
 const KEY = "dispersant-learning-v1";
 const DATE_KEY = "dispersant-learning-completed-at-v1";
 const PROFILE_KEY = "learning-hub-report-profile-v1";
@@ -179,8 +187,9 @@ function resourceLinks(lesson,actionPrefix="") {
     ? lesson.resources
     : [{label:actionPrefix||"Open lesson",url:lesson.url}];
   return `<div class="lesson-links">${resources.map((resource,index)=>{
-    const localVideo=resource.type==="video"&&String(resource.url||"").startsWith("video-player.html");
-    return `<a class="lesson${index?" secondary":""}" href="${esc(resource.url)}" target="${localVideo?"_self":"_blank"}" rel="noopener">${esc(resource.label||"Open lesson")} ${localVideo?"▶":"↗"}</a>`;
+    const localMedia=/^(video|audio)-player\.html/.test(String(resource.url||""));
+    const icon=resource.type==="audio"?"♫":resource.type==="video"?"▶":"↗";
+    return `<a class="lesson${index?" secondary":""}" href="${esc(resource.url)}" target="${localMedia?"_self":"_blank"}" rel="noopener">${esc(resource.label||"Open lesson")} ${icon}</a>`;
   }).join("")}</div>`;
 }
 function sourceReferences(lesson) {
@@ -214,6 +223,55 @@ function progress() {
   const n=lessons.filter(x => completed.has(x.id)).length, t=lessons.length, p=t ? Math.round(n/t*100) : 0;
   done.textContent=n; total.textContent=t; pct.textContent=p+"%"; bar.style.width=p+"%";
 }
+function lessonCard(x) {
+  const c=document.createElement("div");
+  c.className="card"+(x.course?" module-card":"")+(completed.has(x.id)?" done":"");
+  c.innerHTML=`<div class="row">
+    <input type="checkbox" aria-label="Mark ${esc(x.title)} complete" ${completed.has(x.id)?"checked":""}>
+    <div class="grow">
+      ${x.course?`<div class="module-label">Module ${esc(x.module)}</div>`:""}
+      <div class="title">${esc(x.title)}</div>
+      <div class="sub">${esc(x.description)}</div>
+      <div class="meta"><span class="chip">${esc(x.duration)}</span><span class="chip">${esc(x.mode)}</span><span>${esc(x.source)}</span></div>
+      ${resourceLinks(x)}
+      ${sourceReferences(x)}
+      ${completed.has(x.id)?`<label class="completion-date">Completion date <input class="date-editor" type="date" value="${esc(dateInputValue(completedAt[x.id]))}" aria-label="Completion date for ${esc(x.title)}"></label>`:""}
+    </div></div>`;
+  c.querySelector('input[type="checkbox"]').addEventListener("change", e => {
+    if(e.target.checked) {
+      completed.add(x.id);
+      if(!completedAt[x.id]) completedAt[x.id]=todayLocal();
+      recordLessonChange(x.id,true,completedAt[x.id]);
+    } else {
+      completed.delete(x.id);
+      delete completedAt[x.id];
+      recordLessonChange(x.id,false,null);
+    }
+    save(); progress(); render();
+  });
+  const dateEditor=c.querySelector(".date-editor");
+  if(dateEditor) dateEditor.addEventListener("change", e => {
+    if(e.target.value) {
+      completedAt[x.id]=e.target.value;
+      recordLessonChange(x.id,true,e.target.value);
+      save();
+    }
+  });
+  return c;
+}
+function courseCard(course,modules) {
+  const c=document.createElement("div");
+  c.className="course-card";
+  const completedModules=modules.filter(x=>completed.has(x.id)).length;
+  const head=document.createElement("div");
+  head.className="course-head";
+  head.innerHTML=`<div class="course-title">${esc(course.title)}</div>
+    <div class="sub">${esc(course.description)}</div>
+    <div class="course-progress">${completedModules} of ${modules.length} modules complete</div>`;
+  c.appendChild(head);
+  modules.sort((a,b)=>(a.module||0)-(b.module||0)).forEach(x=>c.appendChild(lessonCard(x)));
+  return c;
+}
 function render() {
   list.innerHTML="";
   const filtered=lessons.filter(x => (track.value==="All"||x.track===track.value) && (mode.value==="All"||x.mode===mode.value));
@@ -221,39 +279,17 @@ function render() {
   for (const g of groups) {
     const h=document.createElement("div"); h.className="section-title"; h.textContent=g.name; list.appendChild(h);
     const s=document.createElement("div"); s.className="section-summary"; s.textContent=g.summary; list.appendChild(s);
-    for (const x of filtered.filter(y=>y.track===g.id)) {
-      const c=document.createElement("div"); c.className="card"+(completed.has(x.id)?" done":"");
-      c.innerHTML=`<div class="row">
-        <input type="checkbox" aria-label="Mark ${esc(x.title)} complete" ${completed.has(x.id)?"checked":""}>
-        <div class="grow">
-          <div class="title">${esc(x.title)}</div>
-          <div class="sub">${esc(x.description)}</div>
-          <div class="meta"><span class="chip">${esc(x.duration)}</span><span class="chip">${esc(x.mode)}</span><span>${esc(x.source)}</span></div>
-          ${resourceLinks(x)}
-          ${sourceReferences(x)}
-          ${completed.has(x.id)?`<label class="completion-date">Completion date <input class="date-editor" type="date" value="${esc(dateInputValue(completedAt[x.id]))}" aria-label="Completion date for ${esc(x.title)}"></label>`:""}
-        </div></div>`;
-      c.querySelector('input[type="checkbox"]').addEventListener("change", e => {
-        if(e.target.checked) {
-          completed.add(x.id);
-          if(!completedAt[x.id]) completedAt[x.id]=todayLocal();
-          recordLessonChange(x.id,true,completedAt[x.id]);
-        } else {
-          completed.delete(x.id);
-          delete completedAt[x.id];
-          recordLessonChange(x.id,false,null);
-        }
-        save(); progress(); render();
-      });
-      const dateEditor=c.querySelector(".date-editor");
-      if(dateEditor) dateEditor.addEventListener("change", e => {
-        if(e.target.value) {
-          completedAt[x.id]=e.target.value;
-          recordLessonChange(x.id,true,e.target.value);
-          save();
-        }
-      });
-      list.appendChild(c);
+    const trackItems=filtered.filter(y=>y.track===g.id);
+    const renderedCourses=new Set();
+    for (const x of trackItems) {
+      if(!x.course) {
+        list.appendChild(lessonCard(x));
+        continue;
+      }
+      if(renderedCourses.has(x.course)) continue;
+      renderedCourses.add(x.course);
+      const course=courseById.get(x.course)||{title:x.course,description:"Multi-module course"};
+      list.appendChild(courseCard(course,trackItems.filter(y=>y.course===x.course)));
     }
   }
   if(!filtered.length) list.innerHTML='<div class="sub">No lessons match those filters.</div>';
@@ -261,8 +297,9 @@ function render() {
 function showNext() {
   const filtered=lessons.filter(x => (track.value==="All"||x.track===track.value) && (mode.value==="All"||x.mode===mode.value));
   const x=filtered.find(y=>!completed.has(y.id));
+  const context=x&&x.course?`Module ${esc(x.module)} of ${esc((courseById.get(x.course)||{}).totalModules||"")} · ${esc((courseById.get(x.course)||{}).title||"")}<br>`:"";
   nextBox.innerHTML = x
-    ? `<b>${esc(x.title)}</b><br><span class="sub">${esc(x.duration)} • ${esc(x.mode)} • ${esc(x.source)}</span>${resourceLinks(x,"Start lesson")}`
+    ? `${context}<b>${esc(x.title)}</b><br><span class="sub">${esc(x.duration)} • ${esc(x.mode)} • ${esc(x.source)}</span>${resourceLinks(x,"Start lesson")}`
     : `<b>All matching lessons are complete.</b>`;
 }
 nextBtn.addEventListener("click", showNext);

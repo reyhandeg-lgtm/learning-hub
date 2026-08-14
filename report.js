@@ -48,6 +48,7 @@
     const learner = options.learner || {};
     const completedLessons = curriculum.lessons.filter(x => completedIds.has(x.id));
     const trackById = new Map(curriculum.tracks.map(x => [x.id, x]));
+    const courseById = new Map((curriculum.courses || []).map(x => [x.id, x]));
     const activeTracks = curriculum.tracks.filter(t => completedLessons.some(x => x.track === t.id));
     const paperSize = options.paperSize === "letter" ? "letter" : "a4";
     const doc = new jsPDF({ unit: "mm", format: paperSize, orientation: "portrait", compress: true });
@@ -165,7 +166,9 @@
       y += 7;
 
       completedLessons.filter(x => x.track === track.id).forEach(lesson => {
-        const titleLines = wrapped(lesson.title, contentWidth - 10, 11, "bold");
+        const course = lesson.course ? courseById.get(lesson.course) : null;
+        const displayTitle = course ? course.title + " - Module " + lesson.module + ": " + lesson.title : lesson.title;
+        const titleLines = wrapped(displayTitle, contentWidth - 10, 11, "bold");
         const creatorLines = wrapped((lesson.creator || lesson.source) + " | " + lesson.source, contentWidth - 10, 8.5, "bold");
         const credentialLines = wrapped(lesson.credentials || "Source credentials not listed.", contentWidth - 10, 8.2, "normal");
         const summaryLines = wrapped(cleanSummary(lesson.description), contentWidth - 10, 8.5, "normal");
