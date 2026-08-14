@@ -5,13 +5,17 @@
   const FILE_NAME = "personal-learning-hub-progress.json";
   const API = "https://www.googleapis.com/drive/v3";
   const UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
+  const GRANT_KEY = "learningHubGoogleDriveGranted";
   let options;
   let tokenClient;
   let accessToken = "";
+  let tokenExpiresAt = 0;
+  let tokenExpiryTimer;
   let driveFileId = "";
   let syncTimer;
   let syncing = false;
   let queued = false;
+  let pendingChanges = false;
   let lastSync = 0;
   let libraryPromise;
 
@@ -33,6 +37,30 @@
     return libraryPromise;
   }
 
+  function hasPreviousGrant() {
+    return localStorage.getItem(GRANT_KEY) === "1";
+  }
+
+  function hasUsableToken() {
+    return Boolean(accessToken) && Date.now() < tokenExpiresAt;
+  }
+
+  function pauseForResume() {
+    accessToken = "";
+    tokenExpiresAt = 0;
+    clearTimeout(tokenExpiryTimer);
+    report("expired", pendingChanges
+      ? "Drive sync paused with changes saved on this device. Tap Resume Drive Sync."
+      : "Drive sync paused. Tap Resume Drive Sync when you want to synchronize.");
+  }
+
+  function scheduleTokenExpiry(expiresInSeconds) {
+    clearTimeout(tokenExpiryTimer);
+    const lifetime = Math.max(0, Number(expiresInSeconds || 3600) * 1000);
+    tokenExpiresAt = Date.now() + lifetime;
+    tokenExpiryTimer = setTimeout(pauseForResume, Math.max(0, lifetime - 60000));
+  }
+
   async function authorize() {
     await loadGoogleLibrary();
     if (!tokenClient) {
@@ -49,10 +77,12 @@
           return;
         }
         accessToken = response.access_token;
+        localStorage.setItem(GRANT_KEY, "1");
+        scheduleTokenExpiry(response.expires_in);
         resolve();
       };
       tokenClient.error_callback = error => reject(new Error((error && error.message) || "The Google sign-in window was closed."));
-      tokenClient.requestAccessToken({ prompt: accessToken ? "" : "consent" });
+      tokenClient.requestAccessToken({ prompt: hasPreviousGrant() ? "" : "consent" });
     });
   }
 
@@ -65,8 +95,7 @@
       }
     });
     if (response.status === 401) {
-      accessToken = "";
-      report("expired", "Google session expired. Tap Reconnect Google Drive.");
+      pauseForResume();
       throw new Error("Google session expired.");
     }
     if (!response.ok) {
@@ -153,8 +182,12 @@
   }
 
   async function sync() {
-    if (!accessToken) {
-      report("disconnected", "Connect Google Drive to synchronize across devices.");
+    if (!hasUsableToken()) {
+      if (accessToken) pauseForResume();
+      else if (hasPreviousGrant()) report("expired", pendingChanges
+        ? "Drive sync paused with changes saved on this device. Tap Resume Drive Sync."
+        : "Drive sync paused. Tap Resume Drive Sync when you want to synchronize.");
+      else report("disconnected", "Connect Google Drive to synchronize across devices.");
       return;
     }
     if (syncing) {
@@ -169,6 +202,7 @@
       const merged = mergeStates(local, remote);
       options.applyState(merged);
       await writeRemoteState(merged);
+      pendingChanges = false;
       lastSync = Date.now();
       report("connected", "Google Drive synchronized just now.");
     } catch (error) {
@@ -183,7 +217,7 @@
   }
 
   async function connect() {
-    report("connecting", "Opening Google sign-in…");
+    report("connecting", hasPreviousGrant() ? "Resuming Google Drive sync…" : "Opening Google sign-in…");
     try {
       await authorize();
       report("connected", "Google Drive connected. Synchronizing…");
@@ -194,19 +228,25 @@
   }
 
   function notifyLocalChange() {
-    if (!accessToken) return;
+    pendingChanges = true;
+    if (!hasUsableToken()) {
+      if (hasPreviousGrant()) report("expired", "Changes saved on this device. Tap Resume Drive Sync to upload them.");
+      return;
+    }
     clearTimeout(syncTimer);
     syncTimer = setTimeout(sync, 800);
   }
 
   function init(initOptions) {
     options = initOptions;
-    report("disconnected", "Connect Google Drive to synchronize across devices.");
+    report(hasPreviousGrant() ? "expired" : "disconnected", hasPreviousGrant()
+      ? "Drive sync is ready to resume. Tap Resume Drive Sync."
+      : "Connect Google Drive to synchronize across devices.");
     document.addEventListener("visibilitychange", () => {
-      if (!document.hidden && accessToken && Date.now() - lastSync > 30000) sync();
+      if (!document.hidden && hasUsableToken() && Date.now() - lastSync > 30000) sync();
     });
     window.addEventListener("online", () => {
-      if (accessToken) sync();
+      if (hasUsableToken()) sync();
     });
   }
 

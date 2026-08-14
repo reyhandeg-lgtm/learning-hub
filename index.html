@@ -415,7 +415,7 @@ window.GoogleDriveLearningSync.init({
     syncStatus.textContent=status.message;
     syncStatus.className="sync-status"+(status.state==="connected"?" good":status.state==="error"||status.state==="expired"?" bad":"");
     const connected=status.state==="connected"||status.state==="syncing";
-    googleConnectBtn.textContent=status.state==="expired"?"Reconnect Google Drive":connected?"Google Drive connected":"Connect Google Drive";
+    googleConnectBtn.textContent=status.state==="expired"?"Resume Drive Sync":connected?"Google Drive connected":"Connect Google Drive";
     googleConnectBtn.disabled=status.state==="connecting"||status.state==="syncing"||status.state==="connected";
     syncNowBtn.hidden=!connected;
     syncNowBtn.disabled=status.state==="syncing";
